@@ -15,7 +15,7 @@ class XenforoPassword implements PasswordInterface {
     /**
      * @var string The name of the hashing function to use.
      */
-    protected $hashFunction;
+    private $hashFunction;
 
     /**
      * Initialize an instance of this class.
@@ -53,8 +53,8 @@ class XenforoPassword implements PasswordInterface {
      * @param string $function The hashing function to use.
      * @return string Returns the password hash.
      */
-    protected function hashRaw($password, $salt, $function = null) {
-        if (!$function) {
+    private function hashRaw($password, $salt, $function = '') {
+        if ($function == '') {
             $function = $this->hashFunction;
         }
 
@@ -70,11 +70,7 @@ class XenforoPassword implements PasswordInterface {
         list($stored_hash, $stored_salt) = $this->splitHash($hash);
 
         // Unsalted hashes should be rehashed.
-        if ($stored_hash === false || $stored_salt === false) {
-            return true;
-        }
-
-        return false;
+        return $stored_hash === false || $stored_salt === false;
     }
 
     /**
@@ -95,7 +91,7 @@ class XenforoPassword implements PasswordInterface {
      * @param string $hash The hash to split.
      * @return string[] An array in the form [$hash, $hashFunc, $salt].
      */
-    protected function splitHash($hash) {
+    private function splitHash($hash) {
         $parts = @unserialize($hash);
 
         if (!is_array($parts)) {
@@ -117,5 +113,25 @@ class XenforoPassword implements PasswordInterface {
             $result = [$parts['hash'], $parts['hashFunc'], $parts['salt']];
         }
         return $result;
+    }
+
+    /**
+     * Get the hash function.
+     *
+     * @return string Returns the name of hash function.
+     */
+    public function getHashFunction() {
+        return $this->hashFunction;
+    }
+
+    /**
+     * Set the hash function.
+     *
+     * @param string $hashFunction The name of the new hash function. Some examples would be: crypt, sha256, sha1.
+     * @return DjangoPassword Returns `$this` for fluent calls.
+     */
+    public function setHashFunction($hashFunction) {
+        $this->hashFunction = $hashFunction;
+        return $this;
     }
 }

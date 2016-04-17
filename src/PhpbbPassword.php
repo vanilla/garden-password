@@ -95,7 +95,7 @@ class PhpbbPassword implements PasswordInterface {
      * @param int $count The number of characters to encode.
      * @return string The encoded string.
      */
-    protected function encode64($input, $count) {
+    private function encode64($input, $count) {
         $itoa64 = PhpbbPassword::ITOA64;
         $output = '';
         $i = 0;
@@ -144,7 +144,7 @@ class PhpbbPassword implements PasswordInterface {
             return $hash;
         }
 
-        return null;
+        return '';
     }
 
     /**

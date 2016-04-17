@@ -28,7 +28,7 @@ class IpbPassword implements PasswordInterface {
      * @param string $salt The password salt.
      * @return string Returns the password hash.
      */
-    protected function hashRaw($password, $salt) {
+    private function hashRaw($password, $salt) {
         $calc_hash = md5(md5($salt).md5($password));
 
         return $calc_hash;
@@ -56,7 +56,7 @@ class IpbPassword implements PasswordInterface {
      * @param string $hash The hash to split.
      * @return array An array in the form [$hash, $salt].
      */
-    protected function splitHash($hash) {
+    private function splitHash($hash) {
         if (strpos($hash, '$') === false) {
             return [false, false];
         } else {

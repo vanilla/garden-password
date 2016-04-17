@@ -41,7 +41,7 @@ class PunbbPassword implements PasswordInterface {
      * @param string $salt The password salt.
      * @return string Returns the password hash.
      */
-    protected function hashRaw($password, $salt) {
+    private function hashRaw($password, $salt) {
         $calc_hash = sha1($salt.sha1($password));
 
         return $calc_hash;
@@ -54,11 +54,7 @@ class PunbbPassword implements PasswordInterface {
         list($stored_hash, $stored_salt) = $this->splitHash($hash);
 
         // Unsalted hashes should be rehashed.
-        if ($stored_hash === false || $stored_salt === false) {
-            return true;
-        }
-
-        return false;
+        return $stored_hash === false || $stored_salt === false;
     }
 
     /**
@@ -86,7 +82,7 @@ class PunbbPassword implements PasswordInterface {
      * @param string $hash The hash to split.
      * @return array An array in the form [$hash, $salt].
      */
-    protected function splitHash($hash) {
+    private function splitHash($hash) {
         if (strpos($hash, '$') === false) {
             return [$hash, false];
         } else {

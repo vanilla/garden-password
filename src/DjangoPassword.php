@@ -16,15 +16,15 @@ class DjangoPassword implements PasswordInterface {
     /**
      * @var string The hash method to use when hashing passwords.
      */
-    private $hashMethod;
+    private $hashFunction;
 
     /**
      * Initialize an instance of the {@link DjangoPassword} class.
      *
-     * @param string $hashMethod The hasm method used to hash the passwords.
+     * @param string $hashFunction The hash method used to hash the passwords.
      */
-    public function __construct($hashMethod = 'crypt') {
-        $this->hashMethod = $hashMethod;
+    public function __construct($hashFunction = 'crypt') {
+        $this->hashFunction = $hashFunction;
     }
 
     /**
@@ -32,7 +32,7 @@ class DjangoPassword implements PasswordInterface {
      *
      * @return string|null Returns the salt as a string or **null** if the crypt algorithm isn't known.
      */
-    protected function generateCryptSalt() {
+    private function generateCryptSalt() {
         if (CRYPT_BLOWFISH === 1) {
             $salt = str_replace('+', '/', base64_encode(openssl_random_pseudo_bytes(12)));
         } elseif (CRYPT_EXT_DES) {
@@ -62,21 +62,21 @@ class DjangoPassword implements PasswordInterface {
      * @throws \Exception Throws an exception when the hash method is invalid.
      */
     public function hash($password) {
-        if ($this->hashMethod === 'crypt') {
+        if ($this->hashFunction === 'crypt') {
             $salt = $this->generateCryptSalt();
             try {
                 $hash = crypt($password, $salt);
             } catch (\Exception $ex) {
                 throw new \Exception("$salt is an invalid salt.", $ex);
             }
-        } elseif (in_array($this->hashMethod, hash_algos())) {
+        } elseif (in_array($this->hashFunction, hash_algos())) {
             $salt = base64_encode(openssl_random_pseudo_bytes(12));
-            $hash = hash($this->hashMethod, $salt.$password);
+            $hash = hash($this->hashFunction, $salt.$password);
         } else {
-            throw new \Exception("The {$this->hashMethod} hash method is invalid.", 500);
+            throw new \Exception("The {$this->hashFunction} hash method is invalid.", 500);
         }
 
-        $result = $this->hashMethod.'$'.$salt.'$'.$hash;
+        $result = $this->hashFunction.'$'.$salt.'$'.$hash;
         return $result;
     }
 
@@ -122,22 +122,22 @@ class DjangoPassword implements PasswordInterface {
     }
 
     /**
-     * Get the hash method.
+     * Get the hash function.
      *
-     * @return string Returns the hash method.
+     * @return string Returns the name of hash function.
      */
-    public function getHashMethod() {
-        return $this->hashMethod;
+    public function getHashFunction() {
+        return $this->hashFunction;
     }
 
     /**
-     * Set the hash method.
+     * Set the hash function.
      *
-     * @param string $hashMethod The new hash method. Some examples would be: crypt, sha256, sha1.
+     * @param string $hashFunction The name of the new hash function. Some examples would be: crypt, sha256, sha1.
      * @return DjangoPassword Returns `$this` for fluent calls.
      */
-    public function setHashMethod($hashMethod) {
-        $this->hashMethod = $hashMethod;
+    public function setHashFunction($hashFunction) {
+        $this->hashFunction = $hashFunction;
         return $this;
     }
 }

@@ -27,7 +27,7 @@ class JoomlaPassword implements PasswordInterface {
      * @param string $salt The password salt.
      * @return string Returns the password hash.
      */
-    protected function hashRaw($password, $salt) {
+    private function hashRaw($password, $salt) {
         $calc_hash = md5($password.$salt);
 
         return $calc_hash;
@@ -55,7 +55,7 @@ class JoomlaPassword implements PasswordInterface {
      * @param string $hash The hash to split.
      * @return array An array in the form [$hash, $salt].
      */
-    protected function splitHash($hash) {
+    private function splitHash($hash) {
         if (strpos($hash, ':') === false) {
             return [false, false];
         } else {

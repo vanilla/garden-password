@@ -30,7 +30,7 @@ class VbulletinPassword implements PasswordInterface {
         return $this->hashRaw($password, $salt).$salt;
     }
 
-    protected function hashRaw($password, $salt) {
+    private function hashRaw($password, $salt) {
         $hash = md5(md5($password).$salt);
         return $hash;
     }

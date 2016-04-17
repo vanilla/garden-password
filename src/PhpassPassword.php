@@ -24,7 +24,7 @@ class PhpassPassword implements PasswordInterface {
     private $iteration_count_log2;
     private $random_state;
 
-    protected $hashMethod;
+    private $hashMethod;
 
     /**
      * Initializes an instance of the of the {@link PhpPass} class.
@@ -103,7 +103,7 @@ class PhpassPassword implements PasswordInterface {
      * @param int $count The number of bytes to get.
      * @return string Returns a string of the generated random bytes.
      */
-    protected function getRandomBytes($count) {
+    private function getRandomBytes($count) {
         $output = '';
         if (is_readable('/dev/urandom') &&
             ($fh = @fopen('/dev/urandom', 'rb'))
@@ -132,7 +132,7 @@ class PhpassPassword implements PasswordInterface {
      * @param string $input The random input to generate the salt from.
      * @return string The generated salt.
      */
-    protected function gensaltBlowfish($input) {
+    private function gensaltBlowfish($input) {
         // This one needs to use a different order of characters and a different encoding scheme from the one in
         // encode64() above. We care because the last character in our encoded string will only represent 2 bits.  While
         // two known implementations of bcrypt will happily accept and correct a salt string which has the 4 unused bits
@@ -200,7 +200,7 @@ class PhpassPassword implements PasswordInterface {
      * @param int $count The number of characters to encode.
      * @return string Returns the encoded string.
      */
-    protected function encode64($input, $count) {
+    private function encode64($input, $count) {
         $itoa64 = self::ITOA64;
         $output = '';
         $i = 0;

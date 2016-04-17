@@ -76,7 +76,7 @@ class SmfPassword implements PasswordInterface {
      * @param string $hash The full password hash.
      * @return array An array in the form of [$hash, $username].
      */
-    protected function splitHash($hash) {
+    private function splitHash($hash) {
         if (strpos($hash, '$') === false) {
             return [false, false];
         } else {

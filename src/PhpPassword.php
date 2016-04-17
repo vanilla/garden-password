@@ -12,9 +12,9 @@ namespace Garden\Password;
  */
 class PhpPassword implements PasswordInterface {
     /**
-     * @var int One of the `PASSWORD_*` constants supplied to {@link password_hash()}.
+     * @var int One of the **PASSWORD_*** constants supplied to {@link password_hash()}.
      */
-    protected $algorithm;
+    private $algorithm;
 
     /**
      * Initialize an instance of this class.
@@ -54,5 +54,28 @@ class PhpPassword implements PasswordInterface {
             return false;
         }
         return password_verify((string)$password, (string)$hash);
+    }
+
+    /**
+     * Get the hashing algorithm.
+     *
+     * @return int Returns the algorithm.
+     * @see password_hash()
+     *
+     */
+    public function getAlgorithm() {
+        return $this->algorithm;
+    }
+
+    /**
+     * Set the hashing algorithm.
+     *
+     * @param int $algorithm One of the **PASSWORD_*** constants supplied to {@link password_hash()}.
+     * @return PhpPassword Returns `$this` for fluent calls.
+     * @see password_hash()
+     */
+    public function setAlgorithm($algorithm) {
+        $this->algorithm = $algorithm;
+        return $this;
     }
 }
