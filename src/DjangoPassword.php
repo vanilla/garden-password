@@ -11,13 +11,15 @@ namespace Garden\Password;
  * Implements tha password hashing algorithm from the Django framework.
  */
 class DjangoPassword implements PasswordInterface {
+    private $itoa64 = './0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+
     /**
      * @var string The hash method to use when hashing passwords.
      */
-    public $hashMethod;
+    private $hashMethod;
 
     /**
-     * Initiailize an instance of the {@link DjangoPassword} class.
+     * Initialize an instance of the {@link DjangoPassword} class.
      *
      * @param string $hashMethod The hasm method used to hash the passwords.
      */
@@ -45,7 +47,7 @@ class DjangoPassword implements PasswordInterface {
             $salt .= $this->itoa64[($count >> 12) & 0x3f];
             $salt .= $this->itoa64[($count >> 18) & 0x3f];
 
-            $salt .= substr(base64_encode(openssl_random_pseudo_bytes(3), 0, 3));
+            $salt .= substr(base64_encode(openssl_random_pseudo_bytes(3)), 0, 3);
         } else {
             $salt = null;
         }
@@ -85,7 +87,7 @@ class DjangoPassword implements PasswordInterface {
         if (strpos($hash, '$') === false) {
             return true;
         } else {
-            list($method,,) = explode('$', $hash, 3);
+            list($method, ,) = explode('$', $hash, 3);
             switch (strtolower($method)) {
                 case 'crypt':
                 case 'sha256':
@@ -117,5 +119,25 @@ class DjangoPassword implements PasswordInterface {
                 return false;
             }
         }
+    }
+
+    /**
+     * Get the hash method.
+     *
+     * @return string Returns the hash method.
+     */
+    public function getHashMethod() {
+        return $this->hashMethod;
+    }
+
+    /**
+     * Set the hash method.
+     *
+     * @param string $hashMethod The new hash method. Some examples would be: crypt, sha256, sha1.
+     * @return DjangoPassword Returns `$this` for fluent calls.
+     */
+    public function setHashMethod($hashMethod) {
+        $this->hashMethod = $hashMethod;
+        return $this;
     }
 }
