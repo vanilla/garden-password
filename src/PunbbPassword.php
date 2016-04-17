@@ -24,7 +24,7 @@ namespace Garden\Password;
  * from punbb_users u;
  * ```
  */
-class PunbbPasswordInterface implements PasswordInterface {
+class PunbbPassword implements PasswordInterface {
 
     /**
      * {@inheritdoc}

@@ -30,7 +30,7 @@ namespace Garden\Password;
  * 2. The username is not a secure field and is thus a bad choice for a password salt.
  * 3. It relies on sha1 which is susceptible to a rainbow table attack.
  */
-class SmfPasswordInterface implements PasswordInterface {
+class SmfPassword implements PasswordInterface {
 
     /**
      * Hashes a plaintext password.

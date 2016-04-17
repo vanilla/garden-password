@@ -10,7 +10,7 @@ namespace Garden\Password;
 /**
  * Implements the password hashing algorithm of Mybb.
  */
-class MybbPasswordInterface implements PasswordInterface {
+class MybbPassword implements PasswordInterface {
 
     /**
      * {@inheritdoc}

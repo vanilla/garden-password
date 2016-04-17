@@ -10,7 +10,7 @@ namespace Garden\Password;
 /**
  * Implements the password hashing algorithm of Xenforo.
  */
-class XenforoPasswordInterface implements PasswordInterface {
+class XenforoPassword implements PasswordInterface {
 
     /**
      * @var string The name of the hashing function to use.

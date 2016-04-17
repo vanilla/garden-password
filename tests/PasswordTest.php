@@ -7,10 +7,10 @@
 
 namespace Garden\Tests;
 
-use Garden\Password\DjangoPasswordInterface;
+use Garden\Password\DjangoPassword;
 use Garden\Password\PasswordInterface;
-use Garden\Password\PhpassPasswordInterface;
-use Garden\Password\PhpPasswordInterface;
+use Garden\Password\PhpassPassword;
+use Garden\Password\PhpPassword;
 use Garden\Password\VanillaPassword;
 
 /**
@@ -70,13 +70,13 @@ class PasswordTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * Test some edge cases of {@link PhpassPasswordInterface}.
+     * Test some edge cases of {@link PhpassPassword}.
      *
-     * @param int $hashMethod One of the PhpassPasswordInterface::HASH_* constants.
+     * @param int $hashMethod One of the PhpassPassword::HASH_* constants.
      * @dataProvider providePhpassHashMethods
      */
     public function testPhpassPassword($hashMethod) {
-        $pw = new PhpassPasswordInterface($hashMethod, 1);
+        $pw = new PhpassPassword($hashMethod, 1);
 
         $password = 'password';
         $wrongPassword = 'letmein';
@@ -90,7 +90,7 @@ class PasswordTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * Test some edge cases of {@link PhpassPasswordInterface}.
+     * Test some edge cases of {@link PhpassPassword}.
      */
     public function testVanillaPassword() {
         $pw = new VanillaPassword();
@@ -127,24 +127,24 @@ class PasswordTest extends \PHPUnit_Framework_TestCase {
         $this->assertTrue($pw->needsRehash($password));
 
         // Test Phpass.
-        $phpass = new PhpassPasswordInterface(PhpassPasswordInterface::HASH_PHPASS);
+        $phpass = new PhpassPassword(PhpassPassword::HASH_PHPASS);
         $phphash = $phpass->hash($password);
         $this->assertTrue($pw->verify($password, $phphash));
         $this->assertTrue($pw->needsRehash($phphash));
 
         $this->assertFalse($pw->verify($password, '423432'));
 
-        $pw->setHashMethod(PhpassPasswordInterface::HASH_BLOWFISH);
+        $pw->setHashMethod(PhpassPassword::HASH_BLOWFISH);
         $hash = $pw->hash($password);
         $this->assertTrue($pw->verify($password, $hash));
         $this->assertFalse($pw->needsRehash($hash));
 
-        $pw->setHashMethod(PhpassPasswordInterface::HASH_EXTDES);
+        $pw->setHashMethod(PhpassPassword::HASH_EXTDES);
         $hash2 = $pw->hash($password);
         $this->assertTrue($pw->verify($password, $hash2));
         $this->assertFalse($pw->needsRehash($hash2));
 
-        $pw->setHashMethod(PhpassPasswordInterface::HASH_PHPASS);
+        $pw->setHashMethod(PhpassPassword::HASH_PHPASS);
         $hash3 = $pw->hash($password);
         $this->assertTrue($pw->verify($password, $hash3));
         $this->assertFalse($pw->needsRehash($hash3));
@@ -157,7 +157,7 @@ class PasswordTest extends \PHPUnit_Framework_TestCase {
      * @dataProvider provideDjangoHashMethods
      */
     public function testDjangoPassword($hashMethod) {
-        $pw = new DjangoPasswordInterface($hashMethod);
+        $pw = new DjangoPassword($hashMethod);
 
         $this->testHashAndVerify($pw);
         $this->testWrongPassword($pw);
@@ -175,7 +175,7 @@ class PasswordTest extends \PHPUnit_Framework_TestCase {
      * Test some Django password edge cases.
      */
     public function testDjangoPasswordEdgeCases() {
-        $pw = new DjangoPasswordInterface('sha256');
+        $pw = new DjangoPassword('sha256');
 
         $this->assertTrue($pw->needsRehash('foo'));
 
@@ -187,7 +187,7 @@ class PasswordTest extends \PHPUnit_Framework_TestCase {
         $this->assertTrue($pw->needsRehash($badHash));
         $this->assertFalse($pw->verify('password', $badHash));
 
-        $pw = new DjangoPasswordInterface('foo');
+        $pw = new DjangoPassword('foo');
         $this->setExpectedException('\Exception');
         $hash = $pw->hash('fooo');
     }
@@ -207,16 +207,16 @@ class PasswordTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * Provide the various hash methods for the {@link PhpassPasswordInterface} class.
+     * Provide the various hash methods for the {@link PhpassPassword} class.
      *
      * @return array Returns an array of hash methods.
      */
     public function providePhpassHashMethods() {
         return [
-            'phpass' => [PhpassPasswordInterface::HASH_PHPASS],
-            'extdes' => [PhpassPasswordInterface::HASH_EXTDES],
-            'blowfish' => [PhpassPasswordInterface::HASH_BLOWFISH],
-            'best' => [PhpassPasswordInterface::HASH_BEST],
+            'phpass' => [PhpassPassword::HASH_PHPASS],
+            'extdes' => [PhpassPassword::HASH_EXTDES],
+            'blowfish' => [PhpassPassword::HASH_BLOWFISH],
+            'best' => [PhpassPassword::HASH_BEST],
         ];
     }
 
@@ -237,7 +237,7 @@ class PasswordTest extends \PHPUnit_Framework_TestCase {
             $classname = basename($path, '.php');
 
             // Skip password testing for older versions of php.
-            if ($classname === 'PhpPasswordInterface' && !function_exists('password_verify')) {
+            if ($classname === 'PhpPassword' && !function_exists('password_verify')) {
                 continue;
             }
 
@@ -252,7 +252,7 @@ class PasswordTest extends \PHPUnit_Framework_TestCase {
 
         // Add some extra passwords here.
         if (defined('PASSWORD_BCRYPT')) {
-            $result['PhpPasswordInterface bcrypt'] = [new PhpPasswordInterface(PASSWORD_BCRYPT)];
+            $result['PhpPassword bcrypt'] = [new PhpPassword(PASSWORD_BCRYPT)];
         }
 
         return $result;

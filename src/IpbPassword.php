@@ -11,7 +11,7 @@ namespace Garden\Password;
 /**
  * Implements the password hashing algorithm of Invision Power Board (ipb).
  */
-class IpbPasswordInterface implements PasswordInterface {
+class IpbPassword implements PasswordInterface {
 
     /**
      * {@inheritdoc}

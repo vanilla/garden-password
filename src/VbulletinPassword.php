@@ -17,7 +17,7 @@ namespace Garden\Password;
  * We recommend using this class to validate existing vBulletin passwords, but then rehashing them with a different
  * algorithm.
  */
-class VbulletinPasswordInterface implements PasswordInterface {
+class VbulletinPassword implements PasswordInterface {
 
     /**
      * Hashes a plaintext password.
