@@ -12,6 +12,7 @@ use Garden\Password\PasswordInterface;
 use Garden\Password\PhpassPassword;
 use Garden\Password\PhpPassword;
 use Garden\Password\VanillaPassword;
+use Garden\Password\XenforoPassword;
 
 /**
  * Basic tests for the password objects.
@@ -193,6 +194,51 @@ class PasswordTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
+     * Test a Xenforo hash with no hash method specified.
+     *
+     * @param string $password The password to hash.
+     * @param string $hash The serialized hash that Xenforo expects.
+     * @dataProvider provideXenforoNoHashMethods
+     */
+    public function testXenforoNoHashMethods($password, $hash) {
+        $pw = new XenforoPassword();
+
+        $this->assertTrue($pw->verify($password, $hash));
+    }
+
+    /**
+     * Provide some xenforo hashes with no hash methods.
+     *
+     * @return array Returns a data provider array.
+     */
+    public function provideXenforoNoHashMethods() {
+        $pw = 'password123';
+
+        $r = [
+            $this->xenforoHash($pw, 'md5'),
+            $this->xenforoHash($pw, 'sha1'),
+        ];
+
+        return $r;
+    }
+
+    /**
+     * Make a partial hash to test Xenforo algorithm guessing.
+     *
+     * @param string $password The password to hash.
+     * @param string $function The hashing function.
+     * @return array Returns a single data provider row.
+     */
+    private function xenforoHash($password, $function) {
+        $salt = '1234567890';
+
+        $calc_hash = hash($function, hash($function, $password).$salt);
+        $result = serialize(['hash' => $calc_hash, 'salt' => $salt]);
+
+        return [$password, $result];
+    }
+
+    /**
      * Get the hash methods suitable for Django.
      *
      * @return array Returns an array of django hash methods.
@@ -251,9 +297,13 @@ class PasswordTest extends \PHPUnit_Framework_TestCase {
         }
 
         // Add some extra passwords here.
+
         if (defined('PASSWORD_BCRYPT')) {
             $result['PhpPassword bcrypt'] = [new PhpPassword(PASSWORD_BCRYPT)];
         }
+
+        $result['Xenforo sha1'] = [new XenforoPassword('sha1')];
+        $result['Xenforo sha256'] = [new XenforoPassword('sha256')];
 
         return $result;
     }

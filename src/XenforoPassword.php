@@ -97,7 +97,7 @@ class XenforoPassword implements PasswordInterface {
         if (!is_array($parts)) {
             $result = ['', '', ''];
         } else {
-            $parts = array_merge(['hash' => '', 'hashFunc' => '', 'salt' => ''], $parts);
+            $parts += ['hash' => '', 'hashFunc' => '', 'salt' => ''];
 
             if (!$parts['hashFunc']) {
                 switch (strlen($parts['hash'])) {
