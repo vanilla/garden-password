@@ -10,7 +10,7 @@ namespace Garden\Password;
 /**
  * Implements the password hashing algorithm of Joomla.
  */
-class JoomlaPassword implements IPassword {
+class JoomlaPasswordInterface implements PasswordInterface {
 
     /**
      * {@inheritdoc}
