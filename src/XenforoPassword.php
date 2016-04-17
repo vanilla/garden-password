@@ -93,7 +93,7 @@ class XenforoPassword implements IPassword {
      * Split the hash into its calculated hash and salt.
      *
      * @param string $hash The hash to split.
-     * @return array An array in the form [$hash, $hashFunc, $salt].
+     * @return string[] An array in the form [$hash, $hashFunc, $salt].
      */
     protected function splitHash($hash) {
         $parts = @unserialize($hash);

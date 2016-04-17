@@ -33,7 +33,7 @@ class VanillaPassword extends PhpassPassword {
      * {@inheritdoc}
      */
     public function needsRehash($hash) {
-        if ($this->hashMethod === static::HASH_BEST &&  function_exists('password_needs_rehash')) {
+        if ($this->hashMethod === static::HASH_BEST && function_exists('password_needs_rehash')) {
             return password_needs_rehash($hash, PASSWORD_DEFAULT);
         } elseif (($this->hashMethod & static::HASH_BLOWFISH) && CRYPT_BLOWFISH === 1) {
             return !(preg_match('`^\$(2[axy]|[56])\$`', $hash) && strlen($hash) === 60);
