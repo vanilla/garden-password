@@ -11,7 +11,7 @@ namespace Garden\Password;
  * Implements tha password hashing algorithm from the Django framework.
  */
 class DjangoPassword implements PasswordInterface {
-    private $itoa64 = './0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+    private static $itoa64 = './0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
 
     /**
      * @var string The hash method to use when hashing passwords.
@@ -36,16 +36,15 @@ class DjangoPassword implements PasswordInterface {
         if (CRYPT_BLOWFISH === 1) {
             $salt = str_replace('+', '/', base64_encode(openssl_random_pseudo_bytes(12)));
         } elseif (CRYPT_EXT_DES) {
-            $count_log2 = 24; //min($this->iteration_count_log2 + 8, 24);
-            # This should be odd to not reveal weak DES keys, and the
-            # maximum valid value is (2**24 - 1) which is odd anyway.
+            $count_log2 = 24;
+            // This should be odd to not reveal weak DES keys. The max valid value is (2**24 - 1) which is odd anyway.
             $count = (1 << $count_log2) - 1;
 
             $salt = '_';
-            $salt .= $this->itoa64[$count & 0x3f];
-            $salt .= $this->itoa64[($count >> 6) & 0x3f];
-            $salt .= $this->itoa64[($count >> 12) & 0x3f];
-            $salt .= $this->itoa64[($count >> 18) & 0x3f];
+            $salt .= self::$itoa64[$count & 0x3f];
+            $salt .= self::$itoa64[($count >> 6) & 0x3f];
+            $salt .= self::$itoa64[($count >> 12) & 0x3f];
+            $salt .= self::$itoa64[($count >> 18) & 0x3f];
 
             $salt .= substr(base64_encode(openssl_random_pseudo_bytes(3)), 0, 3);
         } else {
@@ -87,7 +86,7 @@ class DjangoPassword implements PasswordInterface {
         if (strpos($hash, '$') === false) {
             return true;
         } else {
-            list($method,,) = explode('$', $hash, 3);
+            list($method, $_, $_) = explode('$', $hash, 3);
             switch (strtolower($method)) {
                 case 'crypt':
                 case 'sha256':
