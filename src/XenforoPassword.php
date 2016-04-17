@@ -128,7 +128,7 @@ class XenforoPassword implements PasswordInterface {
      * Set the hash function.
      *
      * @param string $hashFunction The name of the new hash function. Some examples would be: crypt, sha256, sha1.
-     * @return DjangoPassword Returns `$this` for fluent calls.
+     * @return XenforoPassword Returns `$this` for fluent calls.
      */
     public function setHashFunction($hashFunction) {
         $this->hashFunction = $hashFunction;
