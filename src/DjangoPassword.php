@@ -86,7 +86,7 @@ class DjangoPassword implements PasswordInterface {
         if (strpos($hash, '$') === false) {
             return true;
         } else {
-            list($method, $_, $_) = explode('$', $hash, 3);
+            list($method,,) = explode('$', $hash, 3);
             switch (strtolower($method)) {
                 case 'crypt':
                 case 'sha256':
