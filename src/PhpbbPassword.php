@@ -16,7 +16,7 @@ namespace Garden\Password;
  * Implements phpBB's password hashing algorithm.
  */
 class PhpbbPassword implements PasswordInterface {
-    const ITOA64 = './0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+    private static $itoa64 = './0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
 
     /**
      * Check for a correct password.
@@ -38,10 +38,9 @@ class PhpbbPassword implements PasswordInterface {
      *
      * @param string $password The password to encrypt.
      * @param string $setting The hash prefix setting. It should start with $H$.
-     * @return string The encypted password.
+     * @return string The encrypted password.
      */
     private function cryptPrivate($password, $setting) {
-        $itoa64 = PhpbbPassword::ITOA64;
         $output = '*';
 
         // Check for correct hash
@@ -49,7 +48,7 @@ class PhpbbPassword implements PasswordInterface {
             return $output;
         }
 
-        $count_log2 = strpos($itoa64, $setting[3]);
+        $count_log2 = strpos(self::$itoa64, $setting[3]);
 
         if ($count_log2 < 7 || $count_log2 > 30) {
             return $output;
@@ -96,19 +95,18 @@ class PhpbbPassword implements PasswordInterface {
      * @return string The encoded string.
      */
     private function encode64($input, $count) {
-        $itoa64 = PhpbbPassword::ITOA64;
         $output = '';
         $i = 0;
 
         do {
             $value = ord($input[$i++]);
-            $output .= $itoa64[$value & 0x3f];
+            $output .= self::$itoa64[$value & 0x3f];
 
             if ($i < $count) {
                 $value |= ord($input[$i]) << 8;
             }
 
-            $output .= $itoa64[($value >> 6) & 0x3f];
+            $output .= self::$itoa64[($value >> 6) & 0x3f];
 
             if ($i++ >= $count) {
                 break;
@@ -118,13 +116,13 @@ class PhpbbPassword implements PasswordInterface {
                 $value |= ord($input[$i]) << 16;
             }
 
-            $output .= $itoa64[($value >> 12) & 0x3f];
+            $output .= self::$itoa64[($value >> 12) & 0x3f];
 
             if ($i++ >= $count) {
                 break;
             }
 
-            $output .= $itoa64[($value >> 18) & 0x3f];
+            $output .= self::$itoa64[($value >> 18) & 0x3f];
         } while ($i < $count);
 
         return $output;
@@ -154,10 +152,8 @@ class PhpbbPassword implements PasswordInterface {
      * @return string Returns the password salt prefixed with `$P$`.
      */
     private function gensaltPrivate($input) {
-        $itoa64 = PhpbbPassword::ITOA64;
-
         $output = '$H$';
-        $output .= $itoa64[min(8 + ((PHP_VERSION >= '5') ? 5 : 3), 30)];
+        $output .= self::$itoa64[min(8 + ((PHP_VERSION >= '5') ? 5 : 3), 30)];
         $output .= $this->encode64($input, 6);
 
         return $output;
