@@ -1,5 +1,5 @@
 {
-	"name": "vanilla/password",
+	"name": "vanilla/garden-password",
 	"description": "Provides a standard password hashing interface and support for password hashing in common frameworks.",
 	"type": "library",
 	"keywords": ["vanilla", "garden", "password", "framework", "vanilla forums", "php"],
