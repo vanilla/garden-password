@@ -1,0 +1,6 @@
+.DS_Store
+.idea/
+cache/
+composer.lock
+Thumbs.db
+vendor/
