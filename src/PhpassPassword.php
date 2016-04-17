@@ -138,6 +138,7 @@ class PhpassPassword implements PasswordInterface {
         // two known implementations of bcrypt will happily accept and correct a salt string which has the 4 unused bits
         // set to non-zero, we do not want to take chances and we also do not want to waste an additional byte of
         // entropy.
+        $itoa64 = self::ITOA64;
 
         $output = '$2a$';
         $output .= chr(ord('0') + $this->iteration_count_log2 / 10);
@@ -147,22 +148,22 @@ class PhpassPassword implements PasswordInterface {
         $i = 0;
         do {
             $c1 = ord($input[$i++]);
-            $output .= self::ITOA64[$c1 >> 2];
+            $output .= $itoa64[$c1 >> 2];
             $c1 = ($c1 & 0x03) << 4;
             if ($i >= 16) {
-                $output .= self::ITOA64[$c1];
+                $output .= $itoa64[$c1];
                 break;
             }
 
             $c2 = ord($input[$i++]);
             $c1 |= $c2 >> 4;
-            $output .= self::ITOA64[$c1];
+            $output .= $itoa64[$c1];
             $c1 = ($c2 & 0x0f) << 2;
 
             $c2 = ord($input[$i++]);
             $c1 |= $c2 >> 6;
-            $output .= self::ITOA64[$c1];
-            $output .= self::ITOA64[$c2 & 0x3f];
+            $output .= $itoa64[$c1];
+            $output .= $itoa64[$c2 & 0x3f];
         } while (1);
 
         return $output;
@@ -179,11 +180,13 @@ class PhpassPassword implements PasswordInterface {
         // This should be odd to not reveal weak DES keys. The maximum valid value is (2**24 - 1) which is odd anyway.
         $count = (1 << $count_log2) - 1;
 
+        $itoa64 = self::ITOA64;
+
         $output = '_';
-        $output .= self::ITOA64[$count & 0x3f];
-        $output .= self::ITOA64[($count >> 6) & 0x3f];
-        $output .= self::ITOA64[($count >> 12) & 0x3f];
-        $output .= self::ITOA64[($count >> 18) & 0x3f];
+        $output .= $itoa64[$count & 0x3f];
+        $output .= $itoa64[($count >> 6) & 0x3f];
+        $output .= $itoa64[($count >> 12) & 0x3f];
+        $output .= $itoa64[($count >> 18) & 0x3f];
 
         $output .= $this->encode64($input, 3);
 
@@ -198,26 +201,27 @@ class PhpassPassword implements PasswordInterface {
      * @return string Returns the encoded string.
      */
     protected function encode64($input, $count) {
+        $itoa64 = self::ITOA64;
         $output = '';
         $i = 0;
         do {
             $value = ord($input[$i++]);
-            $output .= self::ITOA64[$value & 0x3f];
+            $output .= $itoa64[$value & 0x3f];
             if ($i < $count) {
                 $value |= ord($input[$i]) << 8;
             }
-            $output .= self::ITOA64[($value >> 6) & 0x3f];
+            $output .= $itoa64[($value >> 6) & 0x3f];
             if ($i++ >= $count) {
                 break;
             }
             if ($i < $count) {
                 $value |= ord($input[$i]) << 16;
             }
-            $output .= self::ITOA64[($value >> 12) & 0x3f];
+            $output .= $itoa64[($value >> 12) & 0x3f];
             if ($i++ >= $count) {
                 break;
             }
-            $output .= self::ITOA64[($value >> 18) & 0x3f];
+            $output .= $itoa64[($value >> 18) & 0x3f];
         } while ($i < $count);
 
         return $output;
@@ -282,8 +286,9 @@ class PhpassPassword implements PasswordInterface {
      * @return string Returns the password salt prefixed with `$P$`.
      */
     private function gensaltPrivate($input) {
+        $itoa64 = self::ITOA64;
         $output = '$P$';
-        $output .= self::ITOA64[min($this->iteration_count_log2 + ((PHP_VERSION >= '5') ? 5 : 3), 30)];
+        $output .= $itoa64[min($this->iteration_count_log2 + ((PHP_VERSION >= '5') ? 5 : 3), 30)];
         $output .= $this->encode64($input, 6);
 
         return $output;
