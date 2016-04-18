@@ -2,7 +2,7 @@
 	"name": "vanilla/garden-password",
 	"description": "Provides a standard password hashing interface and support for password hashing in common frameworks.",
 	"type": "library",
-	"keywords": ["vanilla", "garden", "password", "framework", "vanilla forums", "php"],
+	"keywords": ["vanilla", "garden", "password", "vanilla forums", "php"],
 	"license": "MIT",
 	"authors": [
 		{ "name": "Todd Burry", "email": "todd@vanillaforums.com", "role": "developer" },
@@ -12,7 +12,8 @@
 		"php": ">=5.4.0"
 	},
 	"suggest": {
-		"php": ">=5.5.0"
+		"php": ">=5.5.0",
+		"ircmaxell/password-compat": "~1.0"
 	},
 	"autoload": {
 		"psr-4": {
