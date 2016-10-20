@@ -53,12 +53,19 @@ class XenforoPassword implements PasswordInterface {
      * @param string $function The hashing function to use.
      * @return string Returns the password hash.
      */
-    private function hashRaw($password, $salt, $function = '') {
+    private function hashRaw($password, $salt, $function = '', $stored_hash = null) {
         if ($function == '') {
             $function = $this->hashFunction;
         }
 
-        $calc_hash = hash($function, hash($function, $password).$salt);
+        if($function !== 'crypt') {
+            $calc_hash = hash($function, hash($function, $password).$salt);
+        } else if(!is_null($stored_hash)){
+            $calc_hash = crypt($password, $stored_hash);
+        } else {
+            throw new Gdn_UserException(t('Unknown hashing method.'));
+        }
+
 
         return $calc_hash;
     }
@@ -79,7 +86,7 @@ class XenforoPassword implements PasswordInterface {
     public function verify($password, $hash) {
         list($stored_hash, $function, $stored_salt) = $this->splitHash($hash);
 
-        $calc_hash = $this->hashRaw($password, $stored_salt, $function);
+        $calc_hash = $this->hashRaw($password, $stored_salt, $function, $stored_hash);
         $result = $calc_hash === $stored_hash;
 
         return $result;
@@ -101,11 +108,16 @@ class XenforoPassword implements PasswordInterface {
 
             if (!$parts['hashFunc']) {
                 switch (strlen($parts['hash'])) {
+                    //xf11, XenForo_Authentication_Core11
                     case 32:
                         $parts['hashFunc'] = 'md5';
                         break;
                     case 40:
                         $parts['hashFunc'] = 'sha1';
+                        break;
+                    //xf12, XenForo_Authentication_Core12
+                    default:
+                        $parts['hashFunc'] = 'crypt';
                         break;
                 }
             }
