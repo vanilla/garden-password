@@ -51,7 +51,7 @@ class XenforoPassword implements PasswordInterface {
      * @param string $password The password to hash.
      * @param string $salt The password salt.
      * @param string $function The hashing function to use.
-     * @param string $the password hash stored in the db.
+     * @param string $storedHash password hash stored in the db.
      * @return string Returns the password hash.
      */
     private function hashRaw($password, $salt, $function = '', $storedHash = null) {
