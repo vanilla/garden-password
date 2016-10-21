@@ -51,36 +51,44 @@ class XenforoPassword implements PasswordInterface {
      * @param string $password The password to hash.
      * @param string $salt The password salt.
      * @param string $function The hashing function to use.
+     * @param string $storedHash password hash stored in the db.
      * @return string Returns the password hash.
      */
-    private function hashRaw($password, $salt, $function = '') {
+    private function hashRaw($password, $salt, $function = '', $storedHash = null) {
         if ($function == '') {
             $function = $this->hashFunction;
         }
 
-        $calc_hash = hash($function, hash($function, $password).$salt);
+        if($function !== 'crypt') {
+            $calcHash = hash($function, hash($function, $password).$salt);
+        } else if(!is_null($storedHash)){
+            $calcHash = crypt($password, $storedHash);
+        } else {
+            throw new Gdn_UserException(t('Unknown hashing/crypting method.'));
+        }
 
-        return $calc_hash;
+
+        return $calcHash;
     }
 
     /**
      * {@inheritdoc}
      */
     public function needsRehash($hash) {
-        list($stored_hash, $stored_salt) = $this->splitHash($hash);
+        list($storedHash, $storedSalt) = $this->splitHash($hash);
 
         // Unsalted hashes should be rehashed.
-        return $stored_hash === false || $stored_salt === false;
+        return $storedHash === false || $storedSalt === false;
     }
 
     /**
      * {@inheritdoc}
      */
     public function verify($password, $hash) {
-        list($stored_hash, $function, $stored_salt) = $this->splitHash($hash);
+        list($storedHash, $function, $storedSalt) = $this->splitHash($hash);
 
-        $calc_hash = $this->hashRaw($password, $stored_salt, $function);
-        $result = $calc_hash === $stored_hash;
+        $calcHash = $this->hashRaw($password, $storedSalt, $function, $storedHash);
+        $result = $calcHash === $storedHash;
 
         return $result;
     }
@@ -101,11 +109,16 @@ class XenforoPassword implements PasswordInterface {
 
             if (!$parts['hashFunc']) {
                 switch (strlen($parts['hash'])) {
+                    //xf11, XenForo_Authentication_Core11
                     case 32:
                         $parts['hashFunc'] = 'md5';
                         break;
                     case 40:
                         $parts['hashFunc'] = 'sha1';
+                        break;
+                    //xf12, XenForo_Authentication_Core12
+                    default:
+                        $parts['hashFunc'] = 'crypt';
                         break;
                 }
             }
