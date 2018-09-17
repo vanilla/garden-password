@@ -100,7 +100,7 @@ class XenforoPassword implements PasswordInterface {
      * @return string[] An array in the form [$hash, $hashFunc, $salt].
      */
     private function splitHash($hash) {
-        $parts = @unserialize($hash);
+        $parts = @unserialize($hash, ['allowed_classes' => false]);
 
         if (!is_array($parts)) {
             $result = ['', '', ''];
