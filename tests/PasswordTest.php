@@ -13,11 +13,12 @@ use Garden\Password\PhpassPassword;
 use Garden\Password\PhpPassword;
 use Garden\Password\VanillaPassword;
 use Garden\Password\XenforoPassword;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Basic tests for the password objects.
  */
-class PasswordTest extends \PHPUnit_Framework_TestCase {
+class PasswordTest extends TestCase {
 
     /**
      * Tests that a password will hash and verify against that hash.
@@ -189,7 +190,7 @@ class PasswordTest extends \PHPUnit_Framework_TestCase {
         $this->assertFalse($pw->verify('password', $badHash));
 
         $pw = new DjangoPassword('foo');
-        $this->setExpectedException('\Exception');
+        $this->expectException(\Exception::class);
         $hash = $pw->hash('fooo');
     }
 
