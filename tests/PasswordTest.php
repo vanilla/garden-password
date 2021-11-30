@@ -8,7 +8,6 @@
 namespace Garden\Tests;
 
 use Garden\Password\DjangoPassword;
-use Garden\Password\DrupalPassword;
 use Garden\Password\PasswordInterface;
 use Garden\Password\PhpassPassword;
 use Garden\Password\PhpPassword;
@@ -308,14 +307,5 @@ class PasswordTest extends TestCase {
         $result['Xenforo sha256'] = [new XenforoPassword('sha256')];
 
         return $result;
-    }
-
-    /**
-     * Test some edge cases of {@link DrupalPassword}.
-     */
-    public function testDrupalPassword() {
-        $pw = new DrupalPassword();
-        $this->assertTrue($pw->verify('w_VkxdHRPjRJY7dgfGdb3q98', '$S$DKAFXs1HceSMqIllAL7GDC1/yl78icSWbCGtNCQaFpm3gpjSXYMT'));
-        $this->assertTrue($pw->verify('CSN@Vanilla', '$S$DScF4C6qIjwrGMmnl7Xqbjx9yPCQ3Jq5.1NnpP6ZlYWZPX9HebZo'));
     }
 }
