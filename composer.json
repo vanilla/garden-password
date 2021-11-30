@@ -9,8 +9,7 @@
 		{ "name": "Tim Gunter", "email": "tim@vanillaforums.com", "role": "developer" }
 	],
 	"require": {
-		"php": ">=5.4.0",
-		"mdespeuilles/drupalpasswordencoderbundle": "*"
+		"php": ">=5.4.0"
 	},
 	"require-dev": {
 		"phpunit/phpunit": "~6.0"
