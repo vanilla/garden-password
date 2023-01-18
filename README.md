@@ -1,8 +1,7 @@
 Garden Password
 ===============
 
-[![Build Status](https://img.shields.io/travis/vanilla/garden-password.svg?style=flat-square)](https://travis-ci.org/vanilla/garden-password)
-[![Coverage](https://img.shields.io/scrutinizer/coverage/g/vanilla/garden-password.svg?style=flat-square)](https://scrutinizer-ci.com/g/vanilla/garden-password/)
+[![CI](https://github.com/vanilla/garden-password/actions/workflows/ci.yml/badge.svg)](https://github.com/vanilla/garden-password/actions/workflows/ci.yml)
 [![Packagist Version](https://img.shields.io/packagist/v/vanilla/garden-password.svg?style=flat-square)](https://packagist.org/packages/vanilla/garden-password)
 ![MIT License](https://img.shields.io/packagist/l/vanilla/garden-password.svg?style=flat-square)
 
