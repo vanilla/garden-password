@@ -4,3 +4,4 @@ cache/
 composer.lock
 Thumbs.db
 vendor/
+.phpunit.result.cache
