@@ -13,13 +13,14 @@ namespace Garden\Password;
  * The code in this class is copied from the phppass library version 0.3 located at http://www.openwall.com/phpass/.
  * Any code copied from the phppass library is copyright the original owner.
  */
-class PhpassPassword implements PasswordInterface {
+class PhpassPassword implements PasswordInterface
+{
     const HASH_PHPASS = 0x00;
     const HASH_BLOWFISH = 0x01;
     const HASH_EXTDES = 0x02;
     const HASH_BEST = 0x03;
 
-    private static $itoa64 = './0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+    private static $itoa64 = "./0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
     private $iteration_count_log2;
     private $random_state;
@@ -32,7 +33,10 @@ class PhpassPassword implements PasswordInterface {
      * @param int $hashMethod The hash method to use when hashing passwords.
      * @param int $iteration_count_log2 The number of times to iterate when generating the passwords.
      */
-    public function __construct($hashMethod = PhpassPassword::HASH_PHPASS, $iteration_count_log2 = 8) {
+    public function __construct(
+        $hashMethod = PhpassPassword::HASH_PHPASS,
+        $iteration_count_log2 = 8
+    ) {
         if ($iteration_count_log2 < 4 || $iteration_count_log2 > 31) {
             $iteration_count_log2 = 8;
         }
@@ -40,7 +44,7 @@ class PhpassPassword implements PasswordInterface {
         $this->hashMethod = $hashMethod;
 
         $this->random_state = microtime();
-        if (function_exists('getmypid')) {
+        if (function_exists("getmypid")) {
             $this->random_state .= getmypid();
         }
     }
@@ -48,9 +52,10 @@ class PhpassPassword implements PasswordInterface {
     /**
      * {@inheritdoc}
      */
-    public function needsRehash($hash) {
+    public function needsRehash($hash)
+    {
         $id = substr($hash, 0, 3);
-        $portable = ($id != '$P$' && $id != '$H$');
+        $portable = $id != '$P$' && $id != '$H$';
 
         return $portable;
     }
@@ -58,24 +63,23 @@ class PhpassPassword implements PasswordInterface {
     /**
      * {@inheritdoc}
      */
-    public function hash($password) {
-        $random = '';
+    public function hash($password)
+    {
+        $random = "";
 
-        if (CRYPT_BLOWFISH == 1 && ($this->hashMethod & self::HASH_BLOWFISH)) {
+        if (CRYPT_BLOWFISH == 1 && $this->hashMethod & self::HASH_BLOWFISH) {
             $random = $this->getRandomBytes(16);
-            $hash =
-                crypt($password, $this->gensaltBlowfish($random));
+            $hash = crypt($password, $this->gensaltBlowfish($random));
             if (strlen($hash) == 60) {
                 return $hash;
             }
         }
 
-        if (CRYPT_EXT_DES == 1 && ($this->hashMethod & self::HASH_EXTDES)) {
+        if (CRYPT_EXT_DES == 1 && $this->hashMethod & self::HASH_EXTDES) {
             if (strlen($random) < 3) {
                 $random = $this->getRandomBytes(3);
             }
-            $hash =
-                crypt($password, $this->gensaltExtended($random));
+            $hash = crypt($password, $this->gensaltExtended($random));
             if (strlen($hash) == 20) {
                 return $hash;
             }
@@ -84,17 +88,14 @@ class PhpassPassword implements PasswordInterface {
         if (strlen($random) < 6) {
             $random = $this->getRandomBytes(6);
         }
-        $hash = $this->cryptPrivate(
-            $password,
-            $this->gensaltPrivate($random)
-        );
+        $hash = $this->cryptPrivate($password, $this->gensaltPrivate($random));
         if (strlen($hash) == 34) {
             return $hash;
         }
 
         // Returning '*' on error is safe here, but would _not_ be safe in a crypt(3)-like function used _both_ for
         // generating new hashes and for validating passwords against existing hashes.
-        return '*';
+        return "*";
     }
 
     /**
@@ -103,22 +104,22 @@ class PhpassPassword implements PasswordInterface {
      * @param int $count The number of bytes to get.
      * @return string Returns a string of the generated random bytes.
      */
-    private function getRandomBytes($count) {
-        $output = '';
-        if (is_readable('/dev/urandom') &&
-            ($fh = @fopen('/dev/urandom', 'rb'))
+    private function getRandomBytes($count)
+    {
+        $output = "";
+        if (
+            is_readable("/dev/urandom") &&
+            ($fh = @fopen("/dev/urandom", "rb"))
         ) {
             $output = fread($fh, $count);
             fclose($fh);
         }
 
         if (strlen($output) < $count) {
-            $output = '';
+            $output = "";
             for ($i = 0; $i < $count; $i += 16) {
-                $this->random_state =
-                    md5(microtime().$this->random_state);
-                $output .=
-                    pack('H*', md5($this->random_state));
+                $this->random_state = md5(microtime() . $this->random_state);
+                $output .= pack("H*", md5($this->random_state));
             }
             $output = substr($output, 0, $count);
         }
@@ -132,7 +133,8 @@ class PhpassPassword implements PasswordInterface {
      * @param string $input The random input to generate the salt from.
      * @return string The generated salt.
      */
-    private function gensaltBlowfish($input) {
+    private function gensaltBlowfish($input)
+    {
         // This one needs to use a different order of characters and a different encoding scheme from the one in
         // encode64() above. We care because the last character in our encoded string will only represent 2 bits.  While
         // two known implementations of bcrypt will happily accept and correct a salt string which has the 4 unused bits
@@ -140,8 +142,8 @@ class PhpassPassword implements PasswordInterface {
         // entropy.
 
         $output = '$2a$';
-        $output .= chr(ord('0') + $this->iteration_count_log2 / 10);
-        $output .= chr(ord('0') + $this->iteration_count_log2 % 10);
+        $output .= chr(ord("0") + (int) $this->iteration_count_log2 / 10);
+        $output .= chr(ord("0") + ((int) $this->iteration_count_log2 % 10));
         $output .= '$';
 
         $i = 0;
@@ -174,12 +176,13 @@ class PhpassPassword implements PasswordInterface {
      * @param string $input The string to generate the salt from.
      * @return string The generated salt.
      */
-    private function gensaltExtended($input) {
+    private function gensaltExtended($input)
+    {
         $count_log2 = min($this->iteration_count_log2 + 8, 24);
         // This should be odd to not reveal weak DES keys. The maximum valid value is (2**24 - 1) which is odd anyway.
         $count = (1 << $count_log2) - 1;
 
-        $output = '_';
+        $output = "_";
         $output .= self::$itoa64[$count & 0x3f];
         $output .= self::$itoa64[($count >> 6) & 0x3f];
         $output .= self::$itoa64[($count >> 12) & 0x3f];
@@ -197,8 +200,9 @@ class PhpassPassword implements PasswordInterface {
      * @param int $count The number of characters to encode.
      * @return string Returns the encoded string.
      */
-    private function encode64($input, $count) {
-        $output = '';
+    private function encode64($input, $count)
+    {
+        $output = "";
         $i = 0;
         do {
             $value = ord($input[$i++]);
@@ -230,10 +234,11 @@ class PhpassPassword implements PasswordInterface {
      * @param string $setting The hash prefix that defines what kind of algorithm to use.
      * @return string Returns the encrypted string.
      */
-    private function cryptPrivate($password, $setting) {
-        $output = '*0';
+    private function cryptPrivate($password, $setting)
+    {
+        $output = "*0";
         if (substr($setting, 0, 2) == $output) {
-            $output = '*1';
+            $output = "*1";
         }
 
         $id = substr($setting, 0, 3);
@@ -257,15 +262,15 @@ class PhpassPassword implements PasswordInterface {
         // We're kind of forced to use MD5 here since it's the only cryptographic primitive available in all versions of
         // PHP currently in use.  To implement our own low-level crypto in PHP would result in much worse performance
         // and consequently in lower iteration counts and hashes that are quicker to crack (by non-PHP code).
-        if (PHP_VERSION >= '5') {
-            $hash = md5($salt.$password, true);
+        if (PHP_VERSION >= "5") {
+            $hash = md5($salt . $password, true);
             do {
-                $hash = md5($hash.$password, false);
+                $hash = md5($hash . $password, false);
             } while (--$count);
         } else {
-            $hash = pack('H*', md5($salt.$password));
+            $hash = pack("H*", md5($salt . $password));
             do {
-                $hash = pack('H*', md5($hash.$password));
+                $hash = pack("H*", md5($hash . $password));
             } while (--$count);
         }
 
@@ -281,9 +286,16 @@ class PhpassPassword implements PasswordInterface {
      * @param string $input The input string to generate the salt from.
      * @return string Returns the password salt prefixed with `$P$`.
      */
-    private function gensaltPrivate($input) {
+    private function gensaltPrivate($input)
+    {
         $output = '$P$';
-        $output .= self::$itoa64[min($this->iteration_count_log2 + ((PHP_VERSION >= '5') ? 5 : 3), 30)];
+        $output .=
+            self::$itoa64[
+                min(
+                    $this->iteration_count_log2 + (PHP_VERSION >= "5" ? 5 : 3),
+                    30
+                )
+            ];
         $output .= $this->encode64($input, 6);
 
         return $output;
@@ -292,12 +304,13 @@ class PhpassPassword implements PasswordInterface {
     /**
      * {@inheritdoc}
      */
-    public function verify($password, $hash) {
+    public function verify($password, $hash)
+    {
         if (!$hash) {
             return false;
         }
         $calc_hash = $this->cryptPrivate($password, $hash);
-        if ($calc_hash[0] === '*') {
+        if ($calc_hash[0] === "*") {
             $calc_hash = crypt($password, $hash);
         }
 
@@ -309,7 +322,8 @@ class PhpassPassword implements PasswordInterface {
      *
      * @return int Returns the current hash method.
      */
-    public function getHashMethod() {
+    public function getHashMethod()
+    {
         return $this->hashMethod;
     }
 
@@ -319,7 +333,8 @@ class PhpassPassword implements PasswordInterface {
      * @param int $hashMethod The new hash mathod.
      * @return PhpassPassword Returns $this for fluent calls.
      */
-    public function setHashMethod($hashMethod) {
+    public function setHashMethod($hashMethod)
+    {
         $this->hashMethod = $hashMethod;
         return $this;
     }
