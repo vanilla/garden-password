@@ -142,7 +142,7 @@ class PhpassPassword implements PasswordInterface
         // entropy.
 
         $output = '$2a$';
-        $output .= chr(ord("0") + (int) $this->iteration_count_log2 / 10);
+        $output .= chr(ord("0") + intval($this->iteration_count_log2 / 10));
         $output .= chr(ord("0") + ($this->iteration_count_log2 % 10));
         $output .= '$';
 
